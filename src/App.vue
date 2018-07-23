@@ -8,11 +8,9 @@
           <h2>{{ artistName }}</h2>
         </div>
       </div>
-      <!--<div class="rotator">
-        <img :src="albumArt" class="image-spin spin-1"/>
-      </div>-->
     </div>
     <SpotifyLogin v-else/>
+    <p id="geoHelper" class="hidden-helper">{{albumArt}}</p>
   </div>
 </template>
 
