@@ -1,28 +1,94 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div v-if="curPlaying" class="art-container">
+      <div class="art-card">
+        <img :src="albumArt" class="album-art"/>
+        <div class="info-box">
+          <h1>{{ songName }}</h1>
+          <h2>{{ artistName }}</h2>
+        </div>
+      </div>
+      <!--<div class="rotator">
+        <img :src="albumArt" class="image-spin spin-1"/>
+      </div>-->
+    </div>
+    <SpotifyLogin v-else/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SpotifyLogin from './components/SpotifyLogin.vue'
 
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
+var axios = require('axios')
+
+export default
+  { name      : 'app'
+  , components:
+    { SpotifyLogin
+    }
+  , data() {
+    return(
+      { authToken : null
+      , curPlaying: null
+      }
+    )
   }
+  , computed  :
+    { songName   : function() {
+        if(!this.curPlaying) return null
+        return this.curPlaying.item.name
+      }
+    , artistName : function() {
+        if(!this.curPlaying) return null
+        return this.curPlaying.item.artists[0].name
+      }
+    , albumArt : function() {
+        if(!this.curPlaying) return null
+        return this.curPlaying.item.album.images[0].url
+      }
+    }
+  , created   : async function() {
+      var token = getTokenHash()
+
+      if(token) {
+        this.authToken = token
+
+        var options =
+          { method  : 'get'
+          , url     : 'https://api.spotify.com/v1/me/player/currently-playing'
+          , headers : { Authorization: 'Bearer ' + token }
+          }
+
+        var curSong = await axios(options)
+
+        this.curPlaying = curSong.data
+      }
+
+      setInterval(async function () {
+        if(this.authToken) {
+          var options =
+            { method  : 'get'
+            , url     : 'https://api.spotify.com/v1/me/player/currently-playing'
+            , headers : { Authorization: 'Bearer ' + this.authToken }
+            }
+
+          var curSong = await axios(options)
+
+          this.curPlaying = curSong.data
+        }
+      }.bind(this), 100)
+
+    }
+  }
+
+function getTokenHash() {
+    var url = window.location.href
+
+    var regex = new RegExp('[?#]access_token(=([^&#]*)|&|#|$)')
+      , results = regex.exec(url)
+
+    if (!results) return null
+    if (!results[2]) return ''
+    return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
