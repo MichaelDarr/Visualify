@@ -1,3 +1,9 @@
+html {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
 body {
   height: 100vh;
   width: 100%;
@@ -17,13 +23,14 @@ body {
 .art-container {
   width: 100%;
   height: 100vh;
-  font-family: 'Comfortaa', cursive;
+  font-family: 'Raleway', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .info-box {
+  text-align: center;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -40,7 +47,7 @@ body {
 }
 
 .art-card {
-  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  box-shadow: 0 19px 38px rgba(0,0,0,0.70), 0 15px 12px rgba(0,0,0,0.50);
   width: 20%;
   min-width: 20rem;
   margin-bottom: 20rem;
