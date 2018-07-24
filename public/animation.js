@@ -11,13 +11,17 @@ scope.zoomIn      = true;
 var zoomIn = false;
 
 var beatCounter = 4;
-var counter = 0;
-var beatsPerMS = 1000;
+var beatsPerMS = 100;
 var steadyZoomSpeed = 0.005;
-var zoomSpeed = 0.02;
+var defaultZoomSpeed = 0.005
+var minBPM = 600;
+var zoomBeats = 16;
+var rotationSpeed = .002;
+
+var zoomSpeed = defaultZoomSpeed;
 
 setInterval(function() {
-  scope.angleTarget = scope.angleTarget + .002;
+  scope.angleTarget = scope.angleTarget + rotationSpeed;
 
   if(zoomIn) {
     scope.zoomTarget = scope.zoomTarget + zoomSpeed
@@ -26,16 +30,12 @@ setInterval(function() {
     scope.zoomTarget = scope.zoomTarget - zoomSpeed
   }
 
-  /*
-   * GENERAL
-   */
-
-   if(scope.zoomIn) {
-     scope.zoomTarget  = scope.zoomTarget + steadyZoomSpeed;
-   }
-   else {
-     scope.zoomTarget  = scope.zoomTarget - steadyZoomSpeed;
-   }
+  if(scope.zoomIn) {
+    scope.zoomTarget  = scope.zoomTarget + steadyZoomSpeed;
+  }
+  else {
+    scope.zoomTarget  = scope.zoomTarget - steadyZoomSpeed;
+  }
 
 }, 100)
 
@@ -45,23 +45,42 @@ setInterval(function() {
 }, 100);
 
 setInterval(function() {
-  beatsPerMS = 60000 / $('#bpmHelper').html();
+  var temp = 60000 / $('#bpmHelper').html();
+  if(temp > (minBPM * 2)) temp = temp / 2;
+  else if(temp < minBPM) temp = temp * 2;
+
+  if(temp > minBPM && temp < (minBPM * 2)) {
+    beatsPerMS = temp;
+  }
 }, 1000);
 
 var pulse = function() {
   /*
    * PULSE
    */
-  console.log('BEAT')
-  console.log(beatCounter)
   zoomIn = !zoomIn;
 
-  if(beatCounter === 17) {
-    console.log('SHWAP')
+  if(beatCounter === (zoomBeats + 1)) {
     scope.zoomIn = !scope.zoomIn;
     beatCounter = 0;
   }
   beatCounter++;
+
+  zoomSpeed = defaultZoomSpeed;
+
+  setTimeout(() => {
+    zoomSpeed = defaultZoomSpeed * 2;
+  }, (beatsPerMS / 4));
+
+  setTimeout(() => {
+    zoomSpeed = defaultZoomSpeed * 4;
+  }, (beatsPerMS / 2));
+
+  setTimeout(() => {
+    zoomSpeed = defaultZoomSpeed * 2;
+  }, ((3 * beatsPerMS) / 4));
+
+
   setTimeout(pulse, beatsPerMS);
 }
 setTimeout(pulse, beatsPerMS);

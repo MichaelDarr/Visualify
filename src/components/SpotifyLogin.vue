@@ -15,8 +15,8 @@ export default
   { methods:
     { spotifyLogin: function() {
 
-        var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=https%3A%2F%2Fvisualizer-fc56a.firebaseapp.com%2F&scope=user-read-currently-playing&response_type=token&state=123'
-        //var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=http%3A%2F%2Flocalhost%3A8080&scope=user-read-currently-playing&response_type=token&state=123'
+        //var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=https%3A%2F%2Fvisualify.live%2F&scope=user-read-currently-playing&response_type=token&state=123'
+        var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=http%3A%2F%2Flocalhost%3A8080&scope=user-read-currently-playing&response_type=token&state=123'
 
         window.location.href = spotifyURL
       }
