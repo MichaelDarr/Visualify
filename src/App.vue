@@ -40,6 +40,7 @@ export default
       , curPlaying: null
       , songId    : null
       , bpm       : null
+      , isPaused  : false
       }
     )
   }
@@ -58,6 +59,9 @@ export default
       }
     }
   , created   : async function() {
+
+      window.addEventListener('keyup', this.keymonitor)
+
       var token = getTokenHash()
       window.location.hash = '';
 
@@ -74,21 +78,51 @@ export default
 
             var curSong = await axios(options)
 
-            if(this.songId === null || curSong.data.item.name !== this.curPlaying.item.name) {
-              this.songId = curSong.data.item.id
-              var newBPM = await updateBPM(curSong.data.item.id, this.authToken)
+            if(curSong.data && curSong.data.item) {
+              if(this.songId === null || curSong.data.item.name !== this.curPlaying.item.name) {
+                this.songId = curSong.data.item.id
+                var newBPM = await updateBPM(curSong.data.item.id, this.authToken)
 
-              this.bpm = newBPM
+                this.bpm = newBPM
+              }
 
-              console.log(this.bpm)
+              this.curPlaying = curSong.data
             }
 
-            this.curPlaying = curSong.data
-
           }
-        }.bind(this), 1000)
-      }
+        }.bind(this), 2000)
 
+        setTimeout(function() {
+          var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=https%3A%2F%2Fvisualify.live%2F&scope=user-read-currently-playing%20user-modify-playback-state&response_type=token&state=123'
+          window.location.href = spotifyURL
+        }, 60 * 55 * 1000)
+      }
+    }
+  , methods: {
+      keymonitor: function(event) {
+        if(event.code == "Space") {
+          if(this.isPaused) {
+            this.isPaused = false
+
+            axios(
+              { method  : 'put'
+              , url     : 'https://api.spotify.com/v1/me/player/play'
+              , headers : { Authorization: 'Bearer ' + this.authToken }
+              }
+            )
+          }
+          else {
+            this.isPaused = true
+
+            axios(
+              { method  : 'put'
+              , url     : 'https://api.spotify.com/v1/me/player/pause'
+              , headers : { Authorization: 'Bearer ' + this.authToken }
+              }
+            )
+          }
+        }
+      }
     }
   }
 

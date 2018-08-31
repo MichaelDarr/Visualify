@@ -10,11 +10,12 @@ scope.zoomIn      = true;
 
 var zoomIn = false;
 
-var beatCounter = 4;
-var counter = 0;
-var beatsPerMS = 1000;
-var steadyZoomSpeed = 0.005;
-var zoomSpeed = 0.02;
+var beatCounter     = 7
+  , counter         = 0
+  , beatsPerMS      = 1000
+  , steadyZoomSpeed = 0.005
+  , zoomSpeed       = 0.02
+  , curAlbumArt     = null
 
 setInterval(function() {
   scope.angleTarget = scope.angleTarget + .002;
@@ -41,7 +42,13 @@ setInterval(function() {
 
 setInterval(function() {
   var curAlbumArt = $('#geoHelper').html();
-  scope.setImage(curAlbumArt);
+
+  if(scope.image.src !== curAlbumArt) {
+    console.log('hit')
+    scope.setImage(curAlbumArt);
+    scope.zoomTarget  = 1.5;
+    scope.angleTarget = 0.5;
+  }
 }, 100);
 
 setInterval(function() {
@@ -52,12 +59,9 @@ var pulse = function() {
   /*
    * PULSE
    */
-  console.log('BEAT')
-  console.log(beatCounter)
   zoomIn = !zoomIn;
 
   if(beatCounter === 17) {
-    console.log('SHWAP')
     scope.zoomIn = !scope.zoomIn;
     beatCounter = 0;
   }
