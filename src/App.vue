@@ -78,21 +78,14 @@ export default
 
             var curSong = await axios(options)
 
-<<<<<<< HEAD
             if(curSong.data && curSong.data.item) {
-=======
-            if(curSong.hasOwnProperty('data')) {
->>>>>>> d9781e1f4e74806f1265ea9b7259849a40b518b3
               if(this.songId === null || curSong.data.item.name !== this.curPlaying.item.name) {
                 this.songId = curSong.data.item.id
                 var newBPM = await updateBPM(curSong.data.item.id, this.authToken)
 
                 this.bpm = newBPM
               }
-<<<<<<< HEAD
 
-=======
->>>>>>> d9781e1f4e74806f1265ea9b7259849a40b518b3
               this.curPlaying = curSong.data
             }
 

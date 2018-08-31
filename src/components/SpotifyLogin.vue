@@ -18,8 +18,8 @@ export default
         var loginurl= 'visualify.live'
           , proto   = 'https'
 
-        //loginurl = 'localhost:8080'
-        //proto = 'http'
+        loginurl = 'localhost:8080'
+        proto = 'http'
 
         var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=' + proto + '%3A%2F%2F' + loginurl + '%2F&scope=user-read-currently-playing%20user-modify-playback-state&response_type=token&state=123'
 
