@@ -21,6 +21,7 @@
     <SpotifyLogin v-else/>
     <p id="geoHelper" class="hidden-helper">{{albumArt}}</p>
     <p id="bpmHelper" class="hidden-helper">{{bpm}}</p>
+    <p id="pulseHelper" class="hidden-helper">{{pEnabled}}</p>
   </div>
 </template>
 
@@ -41,6 +42,7 @@ export default
       , songId    : null
       , bpm       : null
       , isPaused  : false
+      , pEnabled  : true
       }
     )
   }
@@ -100,7 +102,7 @@ export default
     }
   , methods: {
       keymonitor: function(event) {
-        if(event.code == "Space") {
+        if(event.code === "Space") {
           if(this.isPaused) {
             this.isPaused = false
 
@@ -121,6 +123,26 @@ export default
               }
             )
           }
+        }
+        else if(event.code === 'ArrowRight') {
+          axios(
+            { method  : 'put'
+            , url     : 'https://api.spotify.com/v1/me/player/previous'
+            , headers : { Authorization: 'Bearer ' + this.authToken }
+            }
+          )
+        }
+        else if(event.code === 'ArrowLeft') {
+          axios(
+            { method  : 'put'
+            , url     : 'https://api.spotify.com/v1/me/player/next'
+            , headers : { Authorization: 'Bearer ' + this.authToken }
+            }
+          )
+        }
+        else if(event.code === 'KeyP') {
+          console.log('toggled off pulse')
+          this.pEnabled = !this.pEnabled
         }
       }
     }

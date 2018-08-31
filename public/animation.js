@@ -16,15 +16,19 @@ var beatCounter     = 7
   , steadyZoomSpeed = 0.005
   , zoomSpeed       = 0.02
   , curAlbumArt     = null
+  , minBPM          = 600
+  , rotationSpeed   = 0.002
 
 setInterval(function() {
-  scope.angleTarget = scope.angleTarget + .002;
+  scope.angleTarget = scope.angleTarget + rotationSpeed;
 
-  if(zoomIn) {
-    scope.zoomTarget = scope.zoomTarget + zoomSpeed
-  }
-  else {
-    scope.zoomTarget = scope.zoomTarget - zoomSpeed
+  if($('#pulseHelper').html() === 'true') {
+    if(zoomIn) {
+      scope.zoomTarget = scope.zoomTarget + zoomSpeed
+    }
+    else {
+      scope.zoomTarget = scope.zoomTarget - zoomSpeed
+    }
   }
 
   /*
@@ -44,7 +48,6 @@ setInterval(function() {
   var curAlbumArt = $('#geoHelper').html();
 
   if(scope.image.src !== curAlbumArt) {
-    console.log('hit')
     scope.setImage(curAlbumArt);
     scope.zoomTarget  = 1.5;
     scope.angleTarget = 0.5;
@@ -52,7 +55,14 @@ setInterval(function() {
 }, 100);
 
 setInterval(function() {
-  beatsPerMS = 60000 / $('#bpmHelper').html();
+  var temp = 60000 / $('#bpmHelper').html();
+
+  if(temp > (minBPM * 2)) temp = temp / 2;
+  else if(temp < minBPM) temp = temp * 2;
+
+  if(temp > minBPM && temp < (minBPM * 2)) {
+    beatsPerMS = temp;
+  }
 }, 1000);
 
 var pulse = function() {
