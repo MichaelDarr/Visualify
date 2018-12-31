@@ -1,6 +1,6 @@
 <template>
-  <div class="triangle">
-  </div>
+  <canvas class="visualizerHolder">
+  </canvas>
 </template>
 
 
@@ -15,12 +15,9 @@ export default
 
 <style scoped>
 
-div {
-  width       : 0;
-  height      : 0;
-  border-left : 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top  : 20px solid #f00;
+canvas {
+  width       : 100%;
+  height      : 100%;
 }
 
 </style>
