@@ -64,7 +64,7 @@ export default
 
             if(newSong.data && newSong.data.item && newSong.data.item.name !== this.songName) {
               this.$store.commit(
-                { type: 'updateSong'
+                { type      : 'updateSong'
                 , albumArt  : newSong.data.item.album.images[0].url
                 , songName  : newSong.data.item.name
                 , artistName: newSong.data.item.artists[0].name
@@ -79,7 +79,7 @@ export default
             }
 
           }
-        }.bind(this), 2000)
+        }.bind(this), 5000)
 
         // refresh token every 55 minutes, to be on the safe side
         setTimeout(function() {

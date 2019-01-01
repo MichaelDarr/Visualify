@@ -8,18 +8,24 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store(
   { state:
-    { albumArt  : null
-    , songName  : null
-    , artistName: null
-    , songbpm   : null
-    , authToken : null
+    { albumArt      : null
+    , songName      : null
+    , artistName    : null
+    , songbpm       : null
+    , authToken     : null
+    , rotation      : null
+    , albumArtLoaded: null
+    , ctx           : null
     }
   , getters:
-    { albumArt  : state => state.albumArt
-    , songName  : state => state.songName
-    , artistName: state => state.artistName
-    , authToken : state => state.authToken
-    , songbpm   : state => state.songbpm
+    { albumArt      : state => state.albumArt
+    , songName      : state => state.songName
+    , artistName    : state => state.artistName
+    , authToken     : state => state.authToken
+    , songbpm       : state => state.songbpm
+    , rotation      : state => state.rotation
+    , albumArtLoaded: state => state.albumArtLoaded
+    , ctx           : state => state.ctx
     }
   , mutations:
     { updateSong(state, payload) {
@@ -32,6 +38,15 @@ const store = new Vuex.Store(
       }
     , updateSongbpm(state, payload) {
         state.songbpm = payload.songbpm
+      }
+    , rotateTriangles(state) {
+        state.rotation += .01
+      }
+    , loadAlbumArt(state, payload) {
+        state.albumArtLoaded = payload
+      }
+    , setContext(state, payload) {
+        state.ctx = payload
       }
     }
 })
