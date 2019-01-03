@@ -22,11 +22,3 @@ export default
     }
   }
 </script>
-
-<style scoped>
-
-div {
-  display     : none;
-}
-
-</style>

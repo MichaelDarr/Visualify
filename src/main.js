@@ -42,7 +42,7 @@ const store = new Vuex.Store(
         state.songbpm = payload.songbpm
       }
     , rotateTriangles(state) {
-        state.rotation += .001
+        state.rotation += .5
       }
     , loadAlbumArt(state, payload) {
         state.albumArtLoaded = payload

@@ -123,7 +123,11 @@ export default
 
         var finalRotation = (col % 2 == isOddRow) ? -1 : 1
 
-        this.ctx.rotate(this.rotation * finalRotation)
+        var degreesFinalRotation = (col * 60) + this.rotation
+
+        degreesFinalRotation += (row % 2 == 0) ? 180 : 0
+
+        this.ctx.rotate(degreesFinalRotation * finalRotation  * Math.PI / 180)
         this.ctx.translate(-xCoord, -yCoord)
 
       }
