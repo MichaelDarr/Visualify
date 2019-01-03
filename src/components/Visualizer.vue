@@ -1,8 +1,12 @@
 <template>
   <div class="canvasHolder">
-    <canvas ref="visualizerCanvas">
+    <canvas ref="visualizerCanvas" class="visualizerCanvas">
       <Triangle ref="triangles">
       </Triangle>
+    </canvas>
+    <canvas ref="standardCanvas" class="hiddenCanvas">
+    </canvas>
+    <canvas ref="flippedCanvas" class="hiddenCanvas">
     </canvas>
   </div>
 </template>
@@ -23,30 +27,30 @@ export default
     { Triangle
     }
   , data() {
-      return { provider: { context: null } }
+      return (
+        { provider          : {context: null}
+        , standardProvider  : {context: null}
+        , flippedProvider   : {context: null}
+        }
+      )
     }
   , provide() {
-      return { provider: this.provider }
-    }
-  , created() {
-      // rotate the triangles
-      setInterval(async function() {
-        this.$store.commit('rotateTriangles')
-
-        if(this.$refs.triangles) {
-          this.$refs.triangles.spin()
+      return (
+        { provider          : this.provider
+        , standardProvider  : this.standardProvider
+        , flippedProvider   : this.flippedProvider
         }
-      }.bind(this), 50)
+      )
     }
   , mounted() {
-      // We can't access the rendering context until the canvas is mounted to the DOM.
-      // Once we have it, provide it to all child components.
-      this.provider.context = this.$refs['visualizerCanvas'].getContext('2d')
+      this.provider.context         = this.$refs['visualizerCanvas'].getContext('2d')
+      this.standardProvider.context = this.$refs['standardCanvas'].getContext('2d')
+      this.flippedProvider.context  = this.$refs['flippedCanvas'].getContext('2d')
 
       this.$store.commit('setContext', this.provider.context)
+      this.$store.commit('setStandardContext', this.standardProvider.context)
+      this.$store.commit('setFlippedContext', this.flippedProvider.context)
 
-      // Resize the canvas to fit its parent's width.
-      // Normally you'd use a more flexible resize system.
       this.$refs['visualizerCanvas'].width = this.$refs['visualizerCanvas'].parentElement.clientWidth
       this.$refs['visualizerCanvas'].height = this.$refs['visualizerCanvas'].parentElement.clientHeight
     }
@@ -61,6 +65,10 @@ export default
   width       : 100%;
   height      : 100%;
   z-index     : -1;
+}
+
+.hiddenCanvas {
+  visibility: hidden;
 }
 
 </style>
