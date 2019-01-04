@@ -7,11 +7,12 @@ const percentWidthToPix = (percent, ctx) => Math.floor((ctx.canvas.width / 100) 
 
 export default
 { inject: ['provider']
-, props:
-  { width:
-    { type    : Number
-    , default : 20
-    }
+, data() {
+    return(
+      { windowHeight  : 0
+      , windowWidth   : 0
+      }
+    )
   }
 , computed:
   { ...mapGetters(
@@ -19,29 +20,34 @@ export default
       , 'albumArt'
       , 'rotation'
       , 'albumArtWidth'
+      , 'triangleWidth'
       , 'ctx'
       , 'fctx'
       , 'sctx'
       ]
     )
-  , finalHeight() {
-      return percentWidthToPix((this.width / 2) * Math.sqrt(3), this.ctx)
+  , finalTriangleHeight() {
+      return percentWidthToPix((this.triangleWidth / 2) * Math.sqrt(3), this.ctx)
     }
-  , finalWidth() {
-      return percentWidthToPix(this.width, this.ctx)
+  , finalTriangleWidth() {
+      return percentWidthToPix(this.triangleWidth, this.ctx)
     }
   , finalAlbumArtWidth() {
       return percentWidthToPix(this.albumArtWidth, this.ctx)
     }
   }
   , render() {
+
     if(!this.ctx || !this.fctx) return
 
-    this.sctx.canvas.width = this.finalHeight * 3
-    this.sctx.canvas.height = this.finalHeight * 3
+    this.sctx.canvas.width = this.finalTriangleHeight * 3
+    this.sctx.canvas.height = this.finalTriangleHeight * 3
 
-    this.fctx.canvas.width = this.finalHeight * 3
-    this.fctx.canvas.height = this.finalHeight * 3
+    this.fctx.canvas.width = this.finalTriangleHeight * 3
+    this.fctx.canvas.height = this.finalTriangleHeight * 3
+
+    this.windowWidth  = window.innerWidth
+    this.windowHeight = window.innerHeight
 
     var img = new Image()
     img.src = this.albumArt
@@ -57,11 +63,11 @@ export default
         var innerCol = (i % 3)
           , innerRow = Math.floor(i / 3)
 
-        var leftMargin  = this.finalHeight * innerCol
-          , topMargin   = this.finalHeight * innerRow
+        var leftMargin  = this.finalTriangleHeight * innerCol
+          , topMargin   = this.finalTriangleHeight * innerRow
 
-        this.sctx.drawImage(img, 0, 0, img.width, img.height, leftMargin, topMargin, this.finalHeight, this.finalHeight)
-        this.fctx.drawImage(img, 0, 0, img.width, img.height, -leftMargin, topMargin, this.finalHeight * -1, this.finalHeight)
+        this.sctx.drawImage(img, 0, 0, img.width, img.height, leftMargin, topMargin, this.finalTriangleHeight, this.finalTriangleHeight)
+        this.fctx.drawImage(img, 0, 0, img.width, img.height, -leftMargin, topMargin, this.finalTriangleHeight * -1, this.finalTriangleHeight)
       }
       this.fctx.restore()
     }
@@ -69,8 +75,27 @@ export default
     return "<p style='display:none'></p>"
   }
   , mounted() {
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+
+        console.log(window.innerWidth)
+
+        this.windowWidth  = window.innerWidth
+        this.windowHeight = window.innerHeight
+      });
+    })
+
     this.spin()
   }
+  , watch:
+    { windowHeight(newHeight) {
+      this.ctx.canvas.height  = newHeight
+      }
+    , windowWidth(newWidth) {
+        this.ctx.canvas.width   = newWidth
+      }
+    }
   , methods:
     { spin: function() {
 
@@ -79,8 +104,11 @@ export default
           return
         }
 
-        for(var row = 0; row < 4; row++) {
-          for(var col = 0; col < 12; col++) {
+        var numOfRows = Math.ceil(this.windowHeight / this.finalTriangleHeight)
+          , numOfCols = Math.ceil(this.windowWidth * 2 / this.finalTriangleWidth) + 1
+
+        for(var row = 0; row < numOfRows; row++) {
+          for(var col = 0; col < numOfCols; col++) {
             this.ctx.save()
 
             this.drawPath(row, col)
@@ -95,6 +123,9 @@ export default
 
         // iterate rotation modifier
         this.$store.commit('rotateTriangles')
+
+        // pulse artwork
+        this.$store.commit('pulseAlbumArt')
 
         // request that this be re-run on the next frame (stock is 60fps)
         window.requestAnimationFrame(this.spin)
@@ -112,19 +143,16 @@ export default
       }
     , translateCanvas: function(row, col) {
 
-        var xCoord = ((this.finalWidth * .5) * (col - 1)) + ((this.finalWidth - this.finalAlbumArtWidth) / 2) - this.finalAlbumArtWidth + (this.finalAlbumArtWidth * 1.5)
+        var xCoord = ((this.finalTriangleWidth * .5) * (col - 1)) + ((this.finalTriangleWidth - this.finalAlbumArtWidth) / 2) - this.finalAlbumArtWidth + (this.finalAlbumArtWidth * 1.5)
 
-        var yCoord = (this.finalHeight * row) + (this.finalHeight / 2)
+        var yCoord = (this.finalTriangleHeight * row) + (this.finalTriangleHeight / 2)
 
         var isOddRow      = (row % 2) ? 0 : 1
-          , heightOffset  = this.finalHeight / 6
+          , heightOffset  = this.finalTriangleHeight / 6
 
         yCoord += ((col % 2 == isOddRow) ? (-heightOffset) : (heightOffset))
 
-
         this.ctx.translate(xCoord, yCoord)
-
-        var isOddRow = (row % 2) ? 0 : 1
 
         var finalRotation = (col % 2 == isOddRow) ? -1 : 1
 
@@ -138,12 +166,12 @@ export default
       }
     , drawTriangleGrid: function(row, col) {
 
-        var xCoord = ((this.finalWidth * .5) * (col - 1)) + ((this.finalWidth - this.finalAlbumArtWidth) / 2) - this.finalAlbumArtWidth
+        var xCoord = ((this.finalTriangleWidth * .5) * (col - 1)) + ((this.finalTriangleWidth - this.finalAlbumArtWidth) / 2) - this.finalAlbumArtWidth
 
-        var yCoord = (this.finalHeight * row) + (this.finalHeight / 2) - (this.finalAlbumArtWidth * 1.5)
+        var yCoord = (this.finalTriangleHeight * row) + (this.finalTriangleHeight / 2) - (this.finalAlbumArtWidth * 1.5)
 
         var isOddRow      = (row % 2) ? 0 : 1
-          , heightOffset  = this.finalHeight / 6
+          , heightOffset  = this.finalTriangleHeight / 6
 
         yCoord += ((col % 2 == isOddRow) ? (-heightOffset) : (heightOffset))
 
@@ -159,14 +187,14 @@ export default
           , three     : {}
           }
 
-        var startX  = (this.finalWidth * col * .5) - (this.finalWidth * .5)
+        var startX  = (this.finalTriangleWidth * col * .5) - (this.finalTriangleWidth * .5)
 
         triangle.one.x    = startX
-        triangle.two.x    = startX + (this.finalWidth / 2)
-        triangle.three.x  = startX + this.finalWidth
+        triangle.two.x    = startX + (this.finalTriangleWidth / 2)
+        triangle.three.x  = startX + this.finalTriangleWidth
 
-        var startY  = this.finalHeight * row
-          , endY    = startY + this.finalHeight
+        var startY  = this.finalTriangleHeight * row
+          , endY    = startY + this.finalTriangleHeight
 
         var isOddRow = (row % 2) ? 0 : 1
 

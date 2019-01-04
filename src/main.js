@@ -8,28 +8,36 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store(
   { state:
-    { albumArt        : null
-    , songName        : null
-    , artistName      : null
-    , songbpm         : null
-    , authToken       : null
-    , rotation        : null
-    , albumArtWidth   : null
-    , albumArtLoaded  : null
-    , ctx             : null
+    { albumArt          : null
+    , songName          : null
+    , artistName        : null
+    , songbpm           : null
+    , authToken         : null
+    , rotation          : null
+    , albumArtSpinRate  : .2
+    , albumArtZoomRate  : .05
+    , albumArtZoomCeil  : 2
+    , albumArtZoomFloor : .5
+    , albumArtZoomIn    : true
+    , albumArtWidth     : 20
+    , albumArtLoaded    : null
+    , triangleWidth     : 20
+    , ctx               : null
     }
   , getters:
-    { albumArt        : state => state.albumArt
-    , songName        : state => state.songName
-    , artistName      : state => state.artistName
-    , authToken       : state => state.authToken
-    , songbpm         : state => state.songbpm
-    , rotation        : state => state.rotation
-    , albumArtWidth   : state => state.albumArtWidth
-    , albumArtLoaded  : state => state.albumArtLoaded
-    , ctx             : state => state.ctx
-    , sctx            : state => state.sctx
-    , fctx            : state => state.fctx
+    { albumArt          : state => state.albumArt
+    , songName          : state => state.songName
+    , artistName        : state => state.artistName
+    , authToken         : state => state.authToken
+    , songbpm           : state => state.songbpm
+    , rotation          : state => state.rotation
+    , albumArtSpinRate  : state => state.albumArtZoomRate
+    , albumArtWidth     : state => state.albumArtWidth
+    , albumArtLoaded    : state => state.albumArtLoaded
+    , triangleWidth     : state => state.triangleWidth
+    , ctx               : state => state.ctx
+    , sctx              : state => state.sctx
+    , fctx              : state => state.fctx
     }
   , mutations:
     { updateSong(state, payload) {
@@ -44,7 +52,14 @@ const store = new Vuex.Store(
         state.songbpm = payload.songbpm
       }
     , rotateTriangles(state) {
-        state.rotation += .1
+        state.rotation += state.albumArtSpinRate
+      }
+    , pulseAlbumArt(state) {
+        state.albumArtWidth += (state.albumArtZoomIn) ? state.albumArtZoomRate : -state.albumArtZoomRate
+
+        if(state.albumArtWidth > (state.triangleWidth * state.albumArtZoomCeil) || state.albumArtWidth < (state.triangleWidth * state.albumArtZoomFloor)) {
+          state.albumArtZoomIn = !state.albumArtZoomIn
+        }
       }
     , setAlbumArtWidth(state, payload) {
         state.albumArtWidth = payload
@@ -60,6 +75,9 @@ const store = new Vuex.Store(
       }
     , setFlippedContext(state, payload) {
         state.fctx = payload
+      }
+    , setTriangleWidth(state, payload) {
+        state.triangleWidth = payload
       }
     }
 })
