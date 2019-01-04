@@ -22,7 +22,6 @@ export default
       , 'albumArtWidth'
       , 'triangleWidth'
       , 'ctx'
-      , 'fctx'
       , 'sctx'
       ]
     )
@@ -38,13 +37,10 @@ export default
   }
   , render() {
 
-    if(!this.ctx || !this.fctx) return
+    if(!this.ctx || !this.sctx) return
 
-    this.sctx.canvas.width = this.finalTriangleHeight * 3
+    this.sctx.canvas.width = this.finalTriangleHeight * 4
     this.sctx.canvas.height = this.finalTriangleHeight * 3
-
-    this.fctx.canvas.width = this.finalTriangleHeight * 3
-    this.fctx.canvas.height = this.finalTriangleHeight * 3
 
     this.windowWidth  = window.innerWidth
     this.windowHeight = window.innerHeight
@@ -56,20 +52,46 @@ export default
       this.$store.commit('loadAlbumArt', img)
       this.$store.commit('setAlbumArtWidth', 10)
 
-      this.fctx.save()
-      this.fctx.scale(-1, 1)
+      // save the context before we start manipulation
+      this.sctx.save()
 
-      for(var i = 0; i < 9; i++) {
-        var innerCol = (i % 3)
-          , innerRow = Math.floor(i / 3)
+      /* GRID LAYOUT
+       * U = upside-up | D = upside-down
+       * R = reversed  | F = forwards
+       *
+       *  UF | UR | UF | UR
+       * -------------------
+       *  DF | DR | DF | DR
+       * -------------------
+       *  UF | UR | UF | UR
+       */
 
-        var leftMargin  = this.finalTriangleHeight * innerCol
-          , topMargin   = this.finalTriangleHeight * innerRow
+      // start by drawing the two standard "DF" tiles
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, 0, this.finalTriangleHeight, this.finalTriangleHeight, this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, this.finalTriangleHeight * 2, this.finalTriangleHeight, this.finalTriangleHeight, this.finalTriangleHeight)
 
-        this.sctx.drawImage(img, 0, 0, img.width, img.height, leftMargin, topMargin, this.finalTriangleHeight, this.finalTriangleHeight)
-        this.fctx.drawImage(img, 0, 0, img.width, img.height, -leftMargin, topMargin, this.finalTriangleHeight * -1, this.finalTriangleHeight)
-      }
-      this.fctx.restore()
+
+      // reverse it to take care of the two "DR" tiles
+      this.sctx.scale(-1, 1)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, -this.finalTriangleHeight, this.finalTriangleHeight, -this.finalTriangleHeight, this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, -this.finalTriangleHeight * 3, this.finalTriangleHeight, -this.finalTriangleHeight, this.finalTriangleHeight)
+
+
+      // flip it, let's manage the fully flipped/reversed "UR" tiles
+      this.sctx.scale(1, -1)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, -this.finalTriangleHeight, 0, -this.finalTriangleHeight, -this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, -this.finalTriangleHeight * 3, 0, -this.finalTriangleHeight, -this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, -this.finalTriangleHeight, -this.finalTriangleHeight * 2, -this.finalTriangleHeight, -this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, -this.finalTriangleHeight * 3, -this.finalTriangleHeight * 2, -this.finalTriangleHeight, -this.finalTriangleHeight)
+
+      // unreverse, handle the remaining "UF" tiles
+      this.sctx.scale(-1, 1)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, this.finalTriangleHeight, -this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, this.finalTriangleHeight * 2, 0, this.finalTriangleHeight, -this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, 0, -this.finalTriangleHeight * 2, this.finalTriangleHeight, -this.finalTriangleHeight)
+      this.sctx.drawImage(img, 0, 0, img.width, img.height, this.finalTriangleHeight * 2, -this.finalTriangleHeight * 2, this.finalTriangleHeight, -this.finalTriangleHeight)
+
+      this.sctx.restore()
     }
 
     return "<p style='display:none'></p>"
@@ -175,9 +197,9 @@ export default
 
         yCoord += ((col % 2 == isOddRow) ? (-heightOffset) : (heightOffset))
 
-        var imageToDraw = (col % 2 == isOddRow) ? this.fctx.canvas : this.sctx.canvas
+        var canvasOffset = (col % 2 == isOddRow) ? 0 : this.sctx.canvas.width / 4
 
-        this.ctx.drawImage(imageToDraw, 0, 0, imageToDraw.width, imageToDraw.height, xCoord, yCoord, this.finalAlbumArtWidth * 3, this.finalAlbumArtWidth * 3)
+        this.ctx.drawImage(this.sctx.canvas, canvasOffset, 0, this.sctx.canvas.height, this.sctx.canvas.height, xCoord, yCoord, this.finalAlbumArtWidth * 3, this.finalAlbumArtWidth * 3)
       }
     , trianglePoints(row, col) {
 

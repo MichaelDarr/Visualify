@@ -17,12 +17,13 @@ const store = new Vuex.Store(
     , albumArtSpinRate  : .2
     , albumArtZoomRate  : .05
     , albumArtZoomCeil  : 2
-    , albumArtZoomFloor : .5
+    , albumArtZoomFloor : .3
     , albumArtZoomIn    : true
     , albumArtWidth     : 20
     , albumArtLoaded    : null
     , triangleWidth     : 20
     , ctx               : null
+    , sctx              : null
     }
   , getters:
     { albumArt          : state => state.albumArt
@@ -37,7 +38,6 @@ const store = new Vuex.Store(
     , triangleWidth     : state => state.triangleWidth
     , ctx               : state => state.ctx
     , sctx              : state => state.sctx
-    , fctx              : state => state.fctx
     }
   , mutations:
     { updateSong(state, payload) {
@@ -72,9 +72,6 @@ const store = new Vuex.Store(
       }
     , setStandardContext(state, payload) {
         state.sctx = payload
-      }
-    , setFlippedContext(state, payload) {
-        state.fctx = payload
       }
     , setTriangleWidth(state, payload) {
         state.triangleWidth = payload
