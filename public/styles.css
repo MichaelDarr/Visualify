@@ -52,6 +52,7 @@ body {
   width: 20%;
   min-width: 20rem;
   margin-bottom: 20rem;
+  margin-top: 5rem;
   position: relative;
   line-height: 0;
   z-index: 100;

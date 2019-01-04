@@ -8,14 +8,15 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store(
   { state:
-    { albumArt      : null
-    , songName      : null
-    , artistName    : null
-    , songbpm       : null
-    , authToken     : null
-    , rotation      : null
-    , albumArtLoaded: null
-    , ctx           : null
+    { albumArt        : null
+    , songName        : null
+    , artistName      : null
+    , songbpm         : null
+    , authToken       : null
+    , rotation        : null
+    , albumArtWidth   : null
+    , albumArtLoaded  : null
+    , ctx             : null
     }
   , getters:
     { albumArt        : state => state.albumArt
@@ -24,6 +25,7 @@ const store = new Vuex.Store(
     , authToken       : state => state.authToken
     , songbpm         : state => state.songbpm
     , rotation        : state => state.rotation
+    , albumArtWidth   : state => state.albumArtWidth
     , albumArtLoaded  : state => state.albumArtLoaded
     , ctx             : state => state.ctx
     , sctx            : state => state.sctx
@@ -42,7 +44,10 @@ const store = new Vuex.Store(
         state.songbpm = payload.songbpm
       }
     , rotateTriangles(state) {
-        state.rotation += .5
+        state.rotation += .1
+      }
+    , setAlbumArtWidth(state, payload) {
+        state.albumArtWidth = payload
       }
     , loadAlbumArt(state, payload) {
         state.albumArtLoaded = payload

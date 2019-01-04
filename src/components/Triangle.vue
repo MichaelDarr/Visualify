@@ -18,6 +18,7 @@ export default
       [ 'albumArtLoaded'
       , 'albumArt'
       , 'rotation'
+      , 'albumArtWidth'
       , 'ctx'
       , 'fctx'
       , 'sctx'
@@ -28,6 +29,9 @@ export default
     }
   , finalWidth() {
       return percentWidthToPix(this.width, this.ctx)
+    }
+  , finalAlbumArtWidth() {
+      return percentWidthToPix(this.albumArtWidth, this.ctx)
     }
   }
   , render() {
@@ -44,6 +48,7 @@ export default
 
     img.onload = () => {
       this.$store.commit('loadAlbumArt', img)
+      this.$store.commit('setAlbumArtWidth', 10)
 
       this.fctx.save()
       this.fctx.scale(-1, 1)
@@ -107,9 +112,9 @@ export default
       }
     , translateCanvas: function(row, col) {
 
-        var xCoord = ((this.finalWidth * .5) * (col - 1)) + ((this.finalWidth - this.finalHeight) / 2) - this.finalHeight + (this.finalHeight * 1.5)
+        var xCoord = ((this.finalWidth * .5) * (col - 1)) + ((this.finalWidth - this.finalAlbumArtWidth) / 2) - this.finalAlbumArtWidth + (this.finalAlbumArtWidth * 1.5)
 
-        var yCoord = (this.finalHeight * row) - this.finalHeight + (this.finalHeight * 1.5)
+        var yCoord = (this.finalHeight * row) + (this.finalHeight / 2)
 
         var isOddRow      = (row % 2) ? 0 : 1
           , heightOffset  = this.finalHeight / 6
@@ -133,9 +138,9 @@ export default
       }
     , drawTriangleGrid: function(row, col) {
 
-        var xCoord = ((this.finalWidth * .5) * (col - 1)) + ((this.finalWidth - this.finalHeight) / 2) - this.finalHeight
+        var xCoord = ((this.finalWidth * .5) * (col - 1)) + ((this.finalWidth - this.finalAlbumArtWidth) / 2) - this.finalAlbumArtWidth
 
-        var yCoord = (this.finalHeight * row) - this.finalHeight
+        var yCoord = (this.finalHeight * row) + (this.finalHeight / 2) - (this.finalAlbumArtWidth * 1.5)
 
         var isOddRow      = (row % 2) ? 0 : 1
           , heightOffset  = this.finalHeight / 6
@@ -144,7 +149,7 @@ export default
 
         var imageToDraw = (col % 2 == isOddRow) ? this.fctx.canvas : this.sctx.canvas
 
-        this.ctx.drawImage(imageToDraw, 0, 0, imageToDraw.width, imageToDraw.height, xCoord, yCoord, this.finalHeight * 3, this.finalHeight * 3)
+        this.ctx.drawImage(imageToDraw, 0, 0, imageToDraw.width, imageToDraw.height, xCoord, yCoord, this.finalAlbumArtWidth * 3, this.finalAlbumArtWidth * 3)
       }
     , trianglePoints(row, col) {
 
