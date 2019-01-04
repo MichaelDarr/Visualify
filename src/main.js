@@ -1,3 +1,7 @@
+/* this file serves as the base of the program, creating our vue instance
+ * however, more notably, it contains our vuex store
+ */
+
 import Vue from 'vue'
 import Vuex from 'vuex'
 import App from './App.vue'
@@ -5,6 +9,12 @@ import App from './App.vue'
 Vue.config.productionTip = false
 
 Vue.use(Vuex)
+
+/* store variable clarification
+ *
+ * ctx  : the main canvas context
+ * sctx : the "standard canvas", which is hidden and contains the image grid we are sampling from 
+ */
 
 const store = new Vuex.Store(
   { state:

@@ -12,39 +12,18 @@
 
 <script>
 import Triangle from './Triangle.vue'
-import { mapGetters } from 'vuex'
 
 export default
-  { computed:
-    { ...mapGetters(
-        [
-        ]
-      )
-    }
-  , components:
+  { components:
     { Triangle
     }
-  , data() {
-      return (
-        { provider          : {context: null}
-        , standardProvider  : {context: null}
-        }
-      )
-    }
-  , provide() {
-      return (
-        { provider          : this.provider
-        , standardProvider  : this.standardProvider
-        }
-      )
-    }
   , mounted() {
-      this.provider.context         = this.$refs['visualizerCanvas'].getContext('2d')
-      this.standardProvider.context = this.$refs['standardCanvas'].getContext('2d')
 
-      this.$store.commit('setContext', this.provider.context)
-      this.$store.commit('setStandardContext', this.standardProvider.context)
+      // load canvases into vuex store
+      this.$store.commit('setContext', this.$refs['visualizerCanvas'].getContext('2d'))
+      this.$store.commit('setStandardContext', this.$refs['standardCanvas'].getContext('2d'))
 
+      // set the dimensions of the main canvas to that of its parent - in this case, the who screen
       this.$refs['visualizerCanvas'].width = this.$refs['visualizerCanvas'].parentElement.clientWidth
       this.$refs['visualizerCanvas'].height = this.$refs['visualizerCanvas'].parentElement.clientHeight
     }
