@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <div v-if="authToken" class="art-container">
-      <AlbumArt v-if="songName"/>
+      <Console v-if="consoleIsOpen" />
+      <template v-if="songName">
+        <AlbumArt />
+      </template>
       <template v-else>
         <div class="art-card">
           <div class="info-box">
@@ -20,6 +23,7 @@
 import SpotifyLogin from './components/SpotifyLogin.vue'
 import Visualizer from './components/Visualizer.vue'
 import AlbumArt from './components/AlbumArt.vue'
+import Console from './components/Console.vue'
 
 // maps vuex getters to simple this.{x} variables see ...mapGetters
 import { mapGetters } from 'vuex'
@@ -33,11 +37,13 @@ export default
   { SpotifyLogin
   , Visualizer
   , AlbumArt
+  , Console
   }
 , computed:
   { ...mapGetters(
       [ 'songName'
       , 'authToken'
+      , 'consoleIsOpen'
       ]
     )
   }
@@ -140,8 +146,8 @@ export default
           }
         )
       }
-      else if(event.code === 'KeyP') {
-        this.pEnabled = !this.pEnabled
+      else if(event.code === 'KeyC') {
+        this.$store.commit('toggleConsole')
       }
     }
   }
@@ -166,7 +172,6 @@ function getTokenHash() {
 .art-container {
   width: 100%;
   height: 100vh;
-  font-family: 'Raleway', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;

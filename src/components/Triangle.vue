@@ -21,6 +21,7 @@ export default
       , 'rotation'
       , 'albumArtWidth'
       , 'triangleWidth'
+      , 'isLoadingImage'
       , 'ctx'
       , 'sctx'
       ]
@@ -42,6 +43,9 @@ export default
   }
   // this is run in two scenarios - startup, and when a new album cover jumps in
   , render() {
+
+    // two render loops happening at the same time is wonky, so let's control it
+    this.$store.commit('startLoadingImage')
 
     // if the canvas elements have not loaded, dont run this
     if(!this.ctx || !this.sctx) return
@@ -121,6 +125,9 @@ export default
       this.sctx.drawImage(img, 0, 0, img.width, img.height, this.finalTriangleHeight * 2, -this.finalTriangleHeight * 2, this.finalTriangleHeight, -this.finalTriangleHeight)
 
       this.sctx.restore()
+
+      // tell the store we can now load another image
+      this.$store.commit('finishLoadingImage')
     }
 
     // Vue doesn't like it when you return nothing from a render function
