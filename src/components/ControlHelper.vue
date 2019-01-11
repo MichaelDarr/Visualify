@@ -1,7 +1,7 @@
 <template>
   <div class="helper-body">
     <p class="helper-text">
-      Press <span class="key" v-on:click="openConsole">C</span> to see controls and more options!<span class="close-helper" v-on:click="closeHelper">&#10005;</span>
+      Press <span class="key" v-on:click="openConsole">C</span> for controls and more options!<span class="close-helper" v-on:click="closeHelper">&#10005;</span>
     </p>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default
   position: absolute;
   margin: 0 auto;
   bottom: 40px;
-  background-color: #282828;
+  background-color: #121212;
   border-radius: 50px;
   color: white;
   padding: 5px 20px 5px 20px;

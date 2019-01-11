@@ -94,6 +94,14 @@ export default
           , keyName : '→'
           , keyCode : 'ArrowRight'
           }
+        , { label   : 'volume up'
+          , keyName : '↑'
+          , keyCode : 'ArrowUp'
+          }
+        , { label   : 'volume down'
+          , keyName : '↓'
+          , keyCode : 'ArrowDown'
+          }
         , { label   : 'toggle fullscreen'
           , keyName : 'F'
           , keyCode : 'KeyF'

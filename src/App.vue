@@ -163,6 +163,22 @@ export default
           this.makeSpotifyRequest('post', 'v1/me/player/previous')
           break;
 
+        // raise and lower volume
+        case 'ArrowUp':
+          var volumeDetailsUp = await this.makeSpotifyRequest('get', 'v1/me/player')
+
+          var finalVolumeUp = volumeDetailsUp.data.device.volume_percent + 10;
+          if(finalVolumeUp > 100) finalVolumeUp = 100
+          this.makeSpotifyRequest('put', 'v1/me/player/volume?volume_percent=' + finalVolumeUp)
+          break;
+        case 'ArrowDown':
+          var volumeDetailsDown = await this.makeSpotifyRequest('get', 'v1/me/player')
+
+          var finalVolumeDown = volumeDetailsDown.data.device.volume_percent - 10;
+          if(finalVolumeDown < 0) finalVolumeDown = 0
+          this.makeSpotifyRequest('put', 'v1/me/player/volume?volume_percent=' + finalVolumeDown)
+          break;
+
         // control console toggled on/off
         case 'KeyC':
           this.$store.commit('toggleConsole')
