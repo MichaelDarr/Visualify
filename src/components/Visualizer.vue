@@ -1,8 +1,8 @@
 <template>
   <div class="canvasHolder">
     <canvas ref="visualizerCanvas" class="visualizerCanvas">
-      <Triangle ref="triangles">
-      </Triangle>
+      <TriangleTesselation ref="triangles">
+      </TriangleTesselation>
     </canvas>
     <canvas ref="standardCanvas" class="hiddenCanvas">
     </canvas>
@@ -11,11 +11,11 @@
 
 
 <script>
-import Triangle from './Triangle.vue'
+import TriangleTesselation from './TriangleTesselation.vue'
 
 export default
   { components:
-    { Triangle
+    { TriangleTesselation
     }
   , mounted() {
 
