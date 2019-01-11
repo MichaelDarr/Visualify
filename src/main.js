@@ -42,6 +42,7 @@ const store = new Vuex.Store(
     , songIsPlaying       : true
     , helperIsActive      : true
     , songIsPaused        : false
+    , artCardIsActive     : true
     }
   , getters:
     { albumArt            : state => state.albumArt
@@ -67,6 +68,7 @@ const store = new Vuex.Store(
     , songIsPlaying       : state => state.songIsPlaying
     , helperIsActive      : state => state.helperIsActive
     , songIsPaused        : state => state.songIsPaused
+    , artCardIsActive     : state => state.artCardIsActive
     }
   , mutations:
     { updateSong(state, payload) {
@@ -138,6 +140,16 @@ const store = new Vuex.Store(
     , setSongIsPaused(state, payload) {
         state.songIsPaused = payload
       }
+    , toggleArtCardIsActive(state) {
+        if(state.artCardIsActive) {
+          state.myStorage.setItem('artCardIsActive', false)
+          state.artCardIsActive = false
+        }
+        else {
+          state.myStorage.setItem('artCardIsActive', true)
+          state.artCardIsActive = true
+        }
+      }
     , hideConsole(state) {
         state.consoleIsOpen = false
       }
@@ -167,6 +179,7 @@ const store = new Vuex.Store(
           , 'triangleWidth'
           , 'albumArtZoomRate'
           , 'albumArtZoomWindow'
+          , 'artCardIsActive'
           ]
 
         for(var i = 0; i < localVarList.length; i++) {

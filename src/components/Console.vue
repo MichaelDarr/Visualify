@@ -90,7 +90,7 @@ export default
           , keyName : '←'
           , keyCode : 'ArrowLeft'
           }
-        , { label   : 'nextSong'
+        , { label   : 'next song'
           , keyName : '→'
           , keyCode : 'ArrowRight'
           }
@@ -101,6 +101,10 @@ export default
         , { label   : 'show/hide controls'
           , keyName : 'C'
           , keyCode : 'KeyC'
+          }
+        , { label   : 'show/hide art card'
+          , keyName : 'A'
+          , keyCode : 'KeyA'
           }
         , { label   : 'mute playback'
           , keyName : 'M'

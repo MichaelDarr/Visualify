@@ -1,11 +1,9 @@
 <template>
-  <transition name="fade">
-    <div class="helper-body">
-      <p class="helper-text">
-        Press <span class="key" v-on:click="openConsole">C</span> to see controls and more options!<span class="close-helper" v-on:click="closeHelper">&#10005;</span>
-      </p>
-    </div>
-  </transition>
+  <div class="helper-body">
+    <p class="helper-text">
+      Press <span class="key" v-on:click="openConsole">C</span> to see controls and more options!<span class="close-helper" v-on:click="closeHelper">&#10005;</span>
+    </p>
+  </div>
 </template>
 
 <script>
@@ -63,13 +61,6 @@ export default
 .close-helper:hover {
   color: #c3c3c3;
   text-shadow: 0 0 2px white;
-}
-
-.fade-leave-active {
-  transition: all .2s ease-in-out;
-}
-.fade-leave-to {
-  opacity: 0;
 }
 
 </style>

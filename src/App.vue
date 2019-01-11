@@ -5,7 +5,9 @@
         <Console v-if="consoleIsOpen" />
       </transition>
       <template v-if="songName">
-        <AlbumArt />
+        <transition name="fade">
+          <AlbumArt v-if="artCardIsActive"/>
+        </transition>
       </template>
       <template v-else>
         <div class="loading-card">
@@ -16,7 +18,9 @@
         </div>
       </template>
       <Visualizer />
-      <ControlHelper v-if="helperIsActive"/>
+      <transition name="fade">
+        <ControlHelper v-if="helperIsActive"/>
+      </transition>
     </div>
     <SpotifyLogin v-else/>
   </div>
@@ -55,6 +59,7 @@ export default
       , 'songIsPlaying'
       , 'helperIsActive'
       , 'songIsPaused'
+      , 'artCardIsActive'
       ]
     )
   }
@@ -189,6 +194,11 @@ export default
             this.$el.requestFullscreen()
           }
           break;
+
+        // (dis)able art card
+        case 'KeyA':
+          this.$store.commit('toggleArtCardIsActive')
+          break;
       }
     }
   , startInterval: function(callback, seconds) {
@@ -241,6 +251,13 @@ function getTokenHash() {
   position: relative;
   line-height: 0;
   z-index: 50;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 </style>

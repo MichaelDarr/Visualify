@@ -1,9 +1,13 @@
 <template>
   <div class="login-page">
     <div class="centered-login">
-      <h1>Welcome to Visualify.</h1>
+      <h1>Visualify</h1>
+      <h2>Your live spotify stream, visualized.</h2>
       <div class="spacer"></div>
       <img @click="spotifyLogin()" class="spotify-login" src="SpotifyLogin.svg" />
+    </div>
+    <div class="credit-footer">
+      <p>&#169; 2019 Michael Darr</p>
     </div>
   </div>
 </template>
@@ -32,6 +36,11 @@ export default
 
 <style scoped>
 
+h1 {
+  font-size: 4rem;
+  margin-bottom: 0;
+}
+
 .login-page {
   width: 100%;
   height: 100vh;
@@ -46,13 +55,20 @@ export default
 }
 
 .spacer {
-  height: 5vh;
+  height: 20vh;
 }
 
 .spotify-login {
   width: 300px;
   cursor: pointer;
   margin-bottom: 20vh;
+}
+
+.credit-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding-right: 10px;
 }
 
 </style>
