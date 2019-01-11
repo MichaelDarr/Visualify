@@ -8,13 +8,15 @@
         <AlbumArt />
       </template>
       <template v-else>
-        <div class="art-card">
+        <div class="loading-card">
           <div class="info-box">
-            <h1>Loading...</h1>
+            <h1 v-if="songIsPlaying">Loading...</h1>
+            <h1 v-else>No song detected - play something on Spotify!</h1>
           </div>
         </div>
       </template>
       <Visualizer />
+      <ControlHelper v-if="helperIsActive"/>
     </div>
     <SpotifyLogin v-else/>
   </div>
@@ -26,6 +28,7 @@ import SpotifyLogin from './components/SpotifyLogin.vue'
 import Visualizer from './components/Visualizer.vue'
 import AlbumArt from './components/AlbumArt.vue'
 import Console from './components/Console.vue'
+import ControlHelper from './components/ControlHelper.vue'
 
 // maps vuex getters to simple this.{x} variables see ...mapGetters
 import { mapGetters } from 'vuex'
@@ -39,6 +42,7 @@ export default
   { SpotifyLogin
   , Visualizer
   , AlbumArt
+  , ControlHelper
   , Console
   }
 , computed:
@@ -48,6 +52,9 @@ export default
       , 'consoleIsOpen'
       , 'playbackIsMuted'
       , 'volumeCache'
+      , 'songIsPlaying'
+      , 'helperIsActive'
+      , 'songIsPaused'
       ]
     )
   }
@@ -72,6 +79,7 @@ export default
 
           // if there is a song, and it's not the same as the last poll, update the store with new info
           if(newSong.data && newSong.data.item && newSong.data.item.name !== this.songName) {
+            this.$store.commit('setSongIsPlaying', true)
             this.$store.commit(
               { type      : 'updateSong'
               , albumArt  : newSong.data.item.album.images[0].url
@@ -85,6 +93,9 @@ export default
             if(songDeets && songDeets.data) {
               this.$store.commit('updateSongbpm', songDeets.data.track.tempo)
             }
+          }
+          else {
+            this.$store.commit('setSongIsPlaying', false)
           }
 
         }
@@ -107,6 +118,11 @@ export default
         var spotifyURL = urlOne + proto + '%3A%2F%2F' + loginurl + urlTwo
         window.location.href = spotifyURL
       }, 60 * 60 * 1000)
+
+      // get intial song pause state
+      var songIsPausedDetails = await this.makeSpotifyRequest('get', 'v1/me/player')
+      this.$store.commit('setSongIsPaused', !songIsPausedDetails.data.is_playing)
+
     }
   }
 , methods:
@@ -120,16 +136,16 @@ export default
     }
     // handles all keypresses
   , keymonitor: async function(event) {
-
       switch(event.code) {
         // pressing the spacebar pauses/unpauses the song via the spotify API
         case 'Space':
-          if(this.isPaused) {
-            this.isPaused = false
+
+          if(this.songIsPaused) {
+            this.$store.commit('setSongIsPaused', false)
             this.makeSpotifyRequest('put', 'v1/me/player/play')
           }
           else {
-            this.isPaused = true
+            this.$store.commit('setSongIsPaused', true)
             this.makeSpotifyRequest('put', 'v1/me/player/pause')
           }
           break;
@@ -143,8 +159,9 @@ export default
           break;
 
         // control console toggled on/off
-        case 'KeyP':
+        case 'KeyC':
           this.$store.commit('toggleConsole')
+          this.$store.commit('disableHelper')
           break;
 
         // mute playback
@@ -213,6 +230,17 @@ function getTokenHash() {
 }
 .slide-enter, .slide-leave-to{
   transform: translateX(-300px);
+}
+
+.loading-card {
+  box-shadow: 0 19px 38px rgba(0,0,0,0.70), 0 15px 12px rgba(0,0,0,0.50);
+  width: 40%;
+  min-width: 20rem;
+  margin-bottom: 20rem;
+  margin-top: 10rem;
+  position: relative;
+  line-height: 0;
+  z-index: 50;
 }
 
 </style>

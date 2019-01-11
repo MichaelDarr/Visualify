@@ -98,9 +98,9 @@ export default
           , keyName : 'F'
           , keyCode : 'KeyF'
           }
-        , { label   : 'show/hide panel'
-          , keyName : 'P'
-          , keyCode : 'KeyP'
+        , { label   : 'show/hide controls'
+          , keyName : 'C'
+          , keyCode : 'KeyC'
           }
         , { label   : 'mute playback'
           , keyName : 'M'

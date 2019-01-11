@@ -6,7 +6,7 @@
       <h1 v-show="!songNameIsShort">
         <MarqueeText
           :key="songName"
-          :repeat="4"
+          :repeat="3"
         >
           {{ songName }}
         </MarqueeText>
@@ -16,7 +16,7 @@
       <h2 v-show="!artistNameIsShort">
         <MarqueeText
           :key="artistName"
-          :repeat="4"
+          :repeat="3"
         >
           {{ artistName }}
         </MarqueeText>
@@ -53,6 +53,10 @@ export default
         , artistNameIsShort: true
         }
       )
+    }
+  , mounted() {
+      this.songNameIsShort    = (this.$refs.songNameStatic.offsetWidth <= this.$refs.artCard.offsetWidth)
+      this.artistNameIsShort  = (this.$refs.artistNameStatic.offsetWidth <= this.$refs.artCard.offsetWidth)
     }
   , updated() {
       this.songNameIsShort    = (this.$refs.songNameStatic.offsetWidth <= this.$refs.artCard.offsetWidth)

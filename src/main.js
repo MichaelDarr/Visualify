@@ -39,6 +39,9 @@ const store = new Vuex.Store(
     , volumeCache         : 0
     , playbackIsMuted     : false
     , myStorage           : false
+    , songIsPlaying       : true
+    , helperIsActive      : true
+    , songIsPaused        : false
     }
   , getters:
     { albumArt            : state => state.albumArt
@@ -61,6 +64,9 @@ const store = new Vuex.Store(
     , volumeCache         : state => state.volumeCache
     , playbackIsMuted     : state => state.playbackIsMuted
     , myStorage           : state => state.myStorage
+    , songIsPlaying       : state => state.songIsPlaying
+    , helperIsActive      : state => state.helperIsActive
+    , songIsPaused        : state => state.songIsPaused
     }
   , mutations:
     { updateSong(state, payload) {
@@ -126,6 +132,12 @@ const store = new Vuex.Store(
     , setVolumeCache(state, payload) {
         state.volumeCache = payload
       }
+    , setSongIsPlaying(state, payload) {
+        state.songIsPlaying = payload
+      }
+    , setSongIsPaused(state, payload) {
+        state.songIsPaused = payload
+      }
     , hideConsole(state) {
         state.consoleIsOpen = false
       }
@@ -147,6 +159,9 @@ const store = new Vuex.Store(
     , loadLocalStorage(state) {
         state.myStorage = window.localStorage
 
+        // for testing only
+        //state.myStorage.clear()
+
         var localVarList =
           [ 'albumArtSpinRate'
           , 'triangleWidth'
@@ -160,6 +175,15 @@ const store = new Vuex.Store(
             state[localVarList[i]] = storedVar
           }
         }
+
+        var helperIsDisabled = state.myStorage.getItem('helperDisabled')
+        if(helperIsDisabled) {
+          state.helperIsActive = false;
+        }
+      }
+    , disableHelper(state) {
+        state.myStorage.setItem('helperDisabled', true)
+        state.helperIsActive = false;
       }
     }
 })
