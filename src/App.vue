@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <div v-if="authToken" class="art-container">
-      <Console v-if="consoleIsOpen" />
+      <transition name="slide">
+        <Console v-if="consoleIsOpen" />
+      </transition>
       <template v-if="songName">
         <AlbumArt />
       </template>
@@ -44,6 +46,8 @@ export default
       [ 'songName'
       , 'authToken'
       , 'consoleIsOpen'
+      , 'playbackIsMuted'
+      , 'volumeCache'
       ]
     )
   }
@@ -60,16 +64,11 @@ export default
     if(authToken) {
       this.$store.commit('updateToken', { authToken })
 
-      // poll for new song every 2 seconds
-      setInterval(async function () {
+      // poll for new song every 5 seconds
+      this.startInterval(async function () {
         if(this.authToken) {
-          var options =
-            { method  : 'get'
-            , url     : 'https://api.spotify.com/v1/me/player/currently-playing'
-            , headers : { Authorization: 'Bearer ' + this.authToken }
-            }
 
-          var newSong = await axios(options)
+          var newSong = await this.makeSpotifyRequest('get', 'v1/me/player/currently-playing')
 
           // if there is a song, and it's not the same as the last poll, update the store with new info
           if(newSong.data && newSong.data.item && newSong.data.item.name !== this.songName) {
@@ -82,73 +81,102 @@ export default
             )
 
             // for the new song, get further details. Right now, only storing the BPM
-            options.url = 'https://api.spotify.com/v1/audio-analysis/' + newSong.data.item.id
-            var songDeets = await axios(options)
+            var songDeets = await this.makeSpotifyRequest('get', 'v1/audio-analysis/' + newSong.data.item.id)
             if(songDeets && songDeets.data) {
               this.$store.commit('updateSongbpm', songDeets.data.track.tempo)
             }
           }
 
         }
-      }.bind(this), 5000)
+      }.bind(this), 5)
 
-      // refresh token every 55 minutes, to be on the safe side
+      // refresh token every 60 minutes
       // basically, this just sends the browser back to the spotify redirect link.
       // if the user has already authenticated the app (they have), the redirect goes
       // straight back to this website, where the token is detected and they go
       // right back to the visualizer, without pressing any buttons or intervening.
       setTimeout(function() {
-        var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=https%3A%2F%2Fvisualify.live%2F&scope=user-read-currently-playing%20user-modify-playback-state&response_type=token&state=123'
+
+        // grab the redirect url info from an env file - this is mostly for enabling local dev
+        var loginurl  = process.env.VUE_APP_LOGIN_URL
+          , proto     = process.env.VUE_APP_LOGIN_PROTO
+          , urlOne    = process.env.VUE_APP_SPOTIFY_LINK_PART_ONE
+          , urlTwo    = process.env.VUE_APP_SPOTIFY_LINK_PART_TWO
+
+        // build url and redirect
+        var spotifyURL = urlOne + proto + '%3A%2F%2F' + loginurl + urlTwo
         window.location.href = spotifyURL
-      }, 60 * 55 * 1000)
+      }, 60 * 60 * 1000)
     }
   }
-, methods: {
+, methods:
+  { makeSpotifyRequest: async function(method, path) {
+      return axios(
+        { method  : method
+        , url     : 'https://api.spotify.com/' + path
+        , headers : { Authorization: 'Bearer ' + this.authToken }
+        }
+      )
+    }
     // handles all keypresses
-    keymonitor: function(event) {
-      // pressing the spacebar pauses/unpauses the song via the spotify API
-      if(event.code === "Space") {
-        if(this.isPaused) {
-          this.isPaused = false
+  , keymonitor: async function(event) {
 
-          axios(
-            { method  : 'put'
-            , url     : 'https://api.spotify.com/v1/me/player/play'
-            , headers : { Authorization: 'Bearer ' + this.authToken }
-            }
-          )
-        }
-        else {
-          this.isPaused = true
+      switch(event.code) {
+        // pressing the spacebar pauses/unpauses the song via the spotify API
+        case 'Space':
+          if(this.isPaused) {
+            this.isPaused = false
+            this.makeSpotifyRequest('put', 'v1/me/player/play')
+          }
+          else {
+            this.isPaused = true
+            this.makeSpotifyRequest('put', 'v1/me/player/pause')
+          }
+          break;
 
-          axios(
-            { method  : 'put'
-            , url     : 'https://api.spotify.com/v1/me/player/pause'
-            , headers : { Authorization: 'Bearer ' + this.authToken }
-            }
-          )
-        }
-      }
-      // left and right buttons go back/forward in song queue
-      else if(event.code === 'ArrowRight') {
-        axios(
-          { method  : 'post'
-          , url     : 'https://api.spotify.com/v1/me/player/next'
-          , headers : { Authorization: 'Bearer ' + this.authToken }
+        // left and right buttons go back/forward in song queue
+        case 'ArrowRight':
+          this.makeSpotifyRequest('post', 'v1/me/player/next')
+          break;
+        case 'ArrowLeft':
+          this.makeSpotifyRequest('post', 'v1/me/player/previous')
+          break;
+
+        // control console toggled on/off
+        case 'KeyP':
+          this.$store.commit('toggleConsole')
+          break;
+
+        // mute playback
+        case 'KeyM':
+
+          if(this.playbackIsMuted) {
+            this.$store.commit('toggleMutedState')
+            this.makeSpotifyRequest('put', 'v1/me/player/volume?volume_percent=' + this.volumeCache)
           }
-        )
-      }
-      else if(event.code === 'ArrowLeft') {
-        axios(
-          { method  : 'post'
-          , url     : 'https://api.spotify.com/v1/me/player/previous'
-          , headers : { Authorization: 'Bearer ' + this.authToken }
+          else {
+            var volumeDetails = await this.makeSpotifyRequest('get', 'v1/me/player')
+            this.$store.commit('setVolumeCache', volumeDetails.data.device.volume_percent)
+            this.$store.commit('toggleMutedState')
+            this.makeSpotifyRequest('put', 'v1/me/player/volume?volume_percent=0')
           }
-        )
+
+          break;
+
+        // fullscreen
+        case 'KeyF':
+          if(window.innerHeight >= screen.height - 1) {
+            document.exitFullscreen()
+          }
+          else {
+            this.$el.requestFullscreen()
+          }
+          break;
       }
-      else if(event.code === 'KeyC') {
-        this.$store.commit('toggleConsole')
-      }
+    }
+  , startInterval: function(callback, seconds) {
+      callback();
+      return setInterval(callback, seconds * 1000);
     }
   }
 }
@@ -175,6 +203,16 @@ function getTokenHash() {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.slide-enter-active {
+  transition: all .2s ease-in-out;
+}
+.slide-leave-active {
+  transition: all .2s ease-in-out;
+}
+.slide-enter, .slide-leave-to{
+  transform: translateX(-300px);
 }
 
 </style>

@@ -16,11 +16,13 @@ export default
     { spotifyLogin: function() {
 
         // grab the redirect url info from an env file - this is mostly for enabling local dev
-        var loginurl= process.env.VUE_APP_LOGIN_URL
-          , proto   = process.env.VUE_APP_LOGIN_PROTO
+        var loginurl  = process.env.VUE_APP_LOGIN_URL
+          , proto     = process.env.VUE_APP_LOGIN_PROTO
+          , urlOne    = process.env.VUE_APP_SPOTIFY_LINK_PART_ONE
+          , urlTwo    = process.env.VUE_APP_SPOTIFY_LINK_PART_TWO
 
         // build url and redirect
-        var spotifyURL = 'https://accounts.spotify.com/authorize?client_id=644406e4a44a430887b1a180181e897f&redirect_uri=' + proto + '%3A%2F%2F' + loginurl + '%2F&scope=user-read-currently-playing%20user-modify-playback-state&response_type=token&state=123'
+        var spotifyURL = urlOne + proto + '%3A%2F%2F' + loginurl + urlTwo
         window.location.href = spotifyURL
       }
     }

@@ -36,6 +36,9 @@ const store = new Vuex.Store(
     , ctx                 : null
     , sctx                : null
     , consoleIsOpen       : false
+    , volumeCache         : 0
+    , playbackIsMuted     : false
+    , myStorage           : false
     }
   , getters:
     { albumArt            : state => state.albumArt
@@ -55,6 +58,9 @@ const store = new Vuex.Store(
     , ctx                 : state => state.ctx
     , sctx                : state => state.sctx
     , consoleIsOpen       : state => state.consoleIsOpen
+    , volumeCache         : state => state.volumeCache
+    , playbackIsMuted     : state => state.playbackIsMuted
+    , myStorage           : state => state.myStorage
     }
   , mutations:
     { updateSong(state, payload) {
@@ -69,6 +75,7 @@ const store = new Vuex.Store(
         state.songbpm = payload.songbpm
       }
     , setAlbumArtSpinRate(state, payload) {
+        state.myStorage.setItem('albumArtSpinRate', payload)
         state.albumArtSpinRate = payload
       }
     , rotateTriangles(state) {
@@ -105,13 +112,19 @@ const store = new Vuex.Store(
         state.sctx = payload
       }
     , setTriangleWidth(state, payload) {
+        state.myStorage.setItem('triangleWidth', payload)
         state.triangleWidth = payload
       }
     , setAlbumArtZoomRate(state, payload) {
+        state.myStorage.setItem('albumArtZoomRate', payload)
         state.albumArtZoomRate = payload
       }
     , setAlbumArtZoomWindow(state, payload) {
+        state.myStorage.setItem('albumArtZoomWindow', payload)
         state.albumArtZoomWindow = payload
+      }
+    , setVolumeCache(state, payload) {
+        state.volumeCache = payload
       }
     , hideConsole(state) {
         state.consoleIsOpen = false
@@ -122,11 +135,31 @@ const store = new Vuex.Store(
     , toggleConsole(state) {
         state.consoleIsOpen = !state.consoleIsOpen
       }
+    , toggleMutedState(state) {
+        state.playbackIsMuted = !state.playbackIsMuted
+      }
     , startLoadingImage(state) {
         state.isLoadingImage = true
       }
     , finishLoadingImage(state) {
         state.isLoadingImage = false
+      }
+    , loadLocalStorage(state) {
+        state.myStorage = window.localStorage
+
+        var localVarList =
+          [ 'albumArtSpinRate'
+          , 'triangleWidth'
+          , 'albumArtZoomRate'
+          , 'albumArtZoomWindow'
+          ]
+
+        for(var i = 0; i < localVarList.length; i++) {
+          var storedVar = Number(state.myStorage.getItem(localVarList[i]))
+          if(storedVar) {
+            state[localVarList[i]] = storedVar
+          }
+        }
       }
     }
 })

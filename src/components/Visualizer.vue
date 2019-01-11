@@ -26,6 +26,8 @@ export default
       // set the dimensions of the main canvas to that of its parent - in this case, the who screen
       this.$refs['visualizerCanvas'].width = this.$refs['visualizerCanvas'].parentElement.clientWidth
       this.$refs['visualizerCanvas'].height = this.$refs['visualizerCanvas'].parentElement.clientHeight
+
+      this.$store.commit('loadLocalStorage')
     }
   }
 </script>
